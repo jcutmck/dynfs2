@@ -1,0 +1,154 @@
+{
+  "ORD_DET": {
+    "PATIENTINFO": [
+      {
+        "PT_NAME": "RULES TESTING",
+        "DOB": "/Date(1984-10-10T04:00:00.000+00:00)/",
+        "DOB_TEXT": "10-OCT-1984",
+        "GENDER": "Female  ",
+        "MRN": "2952535"
+      }
+    ],
+    "ORD_ID": 5138088759.0,
+    "ORD_EID": 47423205.0,
+    "ORD_PID": 17586732.0,
+    "ORDERINFO": [
+      {
+        "ORD_NAME": "CT Aortic Valve Calcium Score 75571",
+        "STATUS": "Ordered",
+        "ORD_DTTM": "/Date(2023-10-12T14:47:25.000+00:00)/",
+        "ORD_DTTM_TEXT": "12-OCT-2023",
+        "ORD_TYPE": "Radiology",
+        "ORD_BY_ID": 15489644.0,
+        "ORD_PHYS_ID": 10185565.0,
+        "OFFICE_ZIP": "",
+        "OFFICE_ADDRESS": ""
+      }
+    ],
+    "ORD_BY": "",
+    "ORD_PHYS": "CALLISON JR MD AMB, JOHN C",
+    "ORD_ENC_ERROR": "",
+    "ORD_UPDT_APP": 0.0,
+    "ORD_DX": [
+      {
+        "DX_CODE": "R09.89",
+        "DX_NAME": "Other specified symptoms and signs involving the circulatory and respiratory systems"
+      },
+      {
+        "DX_CODE": "J22",
+        "DX_NAME": "Unspecified acute lower respiratory infection"
+      }
+    ],
+    "ORD_DET": [
+      {
+        "OE_FIELD_ID": 4596.0,
+        "OE_FIELD_NAME": "Pregnant",
+        "FIELD_DISP_VAL": "Yes"
+      },
+      {
+        "OE_FIELD_ID": 4613.0,
+        "OE_FIELD_NAME": "Weight Unit",
+        "FIELD_DISP_VAL": "lb"
+      },
+      {
+        "OE_FIELD_ID": 4650.0,
+        "OE_FIELD_NAME": "Frequency",
+        "FIELD_DISP_VAL": "BID"
+      },
+      {
+        "OE_FIELD_ID": 4680.0,
+        "OE_FIELD_NAME": "Stop Date/Time",
+        "FIELD_DISP_VAL": "10/04/23 21:00:00 EDT"
+      },
+      {
+        "OE_FIELD_ID": 7518.0,
+        "OE_FIELD_NAME": "Adhoc Frequency Instance",
+        "FIELD_DISP_VAL": ""
+      },
+      {
+        "OE_FIELD_ID": 11004.0,
+        "OE_FIELD_NAME": "Allergies",
+        "FIELD_DISP_VAL": "No"
+      },
+      {
+        "OE_FIELD_ID": 40569.0,
+        "OE_FIELD_NAME": "Diabetic",
+        "FIELD_DISP_VAL": "No"
+      },
+      {
+        "OE_FIELD_ID": 40570.0,
+        "OE_FIELD_NAME": "Disoriented",
+        "FIELD_DISP_VAL": "No"
+      },
+      {
+        "OE_FIELD_ID": 59929.0,
+        "OE_FIELD_NAME": "ABN Status",
+        "FIELD_DISP_VAL": ""
+      },
+      {
+        "OE_FIELD_ID": 61014.0,
+        "OE_FIELD_NAME": "Reason for Exam",
+        "FIELD_DISP_VAL": "Testing dx codes"
+      },
+      {
+        "OE_FIELD_ID": 101671.0,
+        "OE_FIELD_NAME": "Priority",
+        "FIELD_DISP_VAL": "Routine"
+      },
+      {
+        "OE_FIELD_ID": 12660195.0,
+        "OE_FIELD_NAME": "Special Considerations Radiology",
+        "FIELD_DISP_VAL": "Fall Risk"
+      },
+      {
+        "OE_FIELD_ID": 488574801.0,
+        "OE_FIELD_NAME": "Scheduling STAT/Work In",
+        "FIELD_DISP_VAL": "No"
+      },
+      {
+        "OE_FIELD_ID": 488575405.0,
+        "OE_FIELD_NAME": "Authorization Required",
+        "FIELD_DISP_VAL": "No"
+      },
+      {
+        "OE_FIELD_ID": 670193557.0,
+        "OE_FIELD_NAME": "Authorization Effective Dates",
+        "FIELD_DISP_VAL": "TODAY"
+      }
+    ],
+    "FIN": "29525350001",
+    "VISIT": [
+      {
+        "VISIT_FIN": "29525350001",
+        "VISIT_LOC": "The University of Tennessee Memorial Hospital",
+        "VISIT_DTTM": "/Date(2023-01-16T19:37:10.000+00:00)/",
+        "VISIT_DTTM_TEXT": "16-JAN-2023",
+        "OFFICE_PHONE": "8653059000",
+        "OFFICE_STR_ADDR": "1924 Alcoa Highway",
+        "OFFICE_CITY": "Knoxville",
+        "OFFICE_STATE": "TN",
+        "OFFICE_ZIP": "37920",
+        "OFFICE_ADDRESS": "Knoxville, TN, 37920"
+      }
+    ],
+    "ALLERGIES": [{ "NAME": "Toradol" }],
+    "INS": [
+      {
+        "INS_PRIORITYSEQ": 0,
+        "INS_PRIORITY": "Primary:",
+        "INS_PLANNAME": "Tn Care Unit Hlth Comm Pln 227",
+        "INS_MEMNBR": "106391522",
+        "INS_GRPNUM": "UNEMP",
+        "INS_PLANPHONE": "8006901606"
+      },
+      {
+        "INS_PRIORITYSEQ": 1,
+        "INS_PRIORITY": "Secondary:",
+        "INS_PLANNAME": "Bl Care Plus DSNP MC Replacement",
+        "INS_MEMNBR": "ZEU906101631",
+        "INS_GRPNUM": "",
+        "INS_PLANPHONE": "8002991407"
+      }
+    ]
+  }
+}

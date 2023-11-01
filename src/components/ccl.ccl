@@ -1,0 +1,379 @@
+drop program   ut_onc_reg_meds go
+create program ut_onc_reg_meds
+ 
+declare hld_person_id = f8 with protect
+declare hld_reg_catlg_id = f8 with protect
+declare hld_reg_id = f8 with protect
+declare hld_regnm = c250 with protect
+declare ret_str = vc
+ 
+declare hld_dose = c25 with protect
+declare hld_dose_unit = c50 with protect
+ 
+declare cnt = i4  with protect
+declare x = i4 with protect
+declare hld_cycle_nbr = i4  with protect
+ 
+set cnt = 0
+ 
+/* HTML Variables */
+set rhead_font      = "{\rtf1\ansi \deff0{\fonttbl{\f0\fswiss Arial;}}"   
+set  wr  =  "\plain \f0 \fs20 \cb2 "
+SET  WBU  =  "\plain \f0 \fs20 \b \ul \cb2 "
+SET tblrb = "\trowd "                ;begin table row
+SET col1 = "\cellx3500 "
+SET col2 = "\cellx5250 "        ;cell/col 2 definition
+SET col3 = "\cellx10000 "        ;cell/col 3 definition
+SET cellb = "\intbl "                ;open cell
+SET celle = "\cell "                ;close cell
+SET tblre = "\row "                 ;end table row
+ 
+free record reg_orders
+record reg_orders (
+	1 lst[*]
+	  2 order_name = c250
+	  2 order_id = f8
+	  2 treat_period = c250
+	  2 med_dose = c50
+	  2 proposed = c1
+)
+ 
+set retval = 0
+ 
+/* Get Regimen and Cycle */
+SELECT INTO "nl:"
+FROM ORDERS O
+	, ACT_PW_COMP   apc
+	, PATHWAY   PW
+	, REGIMEN_DETAIL   RD
+	, REGIMEN   R
+ 
+PLAN O where o.order_id = link_orderid
+JOIN APC where apc.parent_entity_id = o.order_id
+JOIN PW where pw.pathway_id = apc.pathway_id
+JOIN RD where rd.activity_entity_id = pw.pw_group_nbr
+	and rd.activity_entity_name = 'PATHWAY'
+	and rd.reference_entity_name = 'PATHWAY_CATALOG'
+JOIN R where r.regimen_id = rd.regimen_id
+ 
+DETAIL
+   hld_cycle_nbr = pw.cycle_nbr
+   hld_person_id = o.person_id
+   hld_reg_catlg_id = r.regimen_catalog_id
+   hld_reg_id = r.regimen_id
+   hld_regnm = r.regimen_name
+ 
+WITH nocounter, time=30
+ 
+/**************************************/
+/* Load Future Orders From Curr Cycle
+/**************************************/
+SELECT INTO "NL:"
+  o.hna_order_mnemonic,
+  o.order_id,
+  od.oe_field_display_value
+ 
+FROM
+  regimen r,
+  regimen_detail rd,
+  pathway pw,
+  act_pw_comp apc,
+  order_detail od,
+  orders o
+ 
+WHERE
+  r.regimen_id = hld_reg_id AND
+
+  rd.regimen_id = r.regimen_id AND
+  rd.activity_entity_name = 'PATHWAY' AND
+  rd.reference_entity_name = 'PATHWAY_CATALOG' AND
+
+  pw.pw_group_nbr = rd.activity_entity_id AND
+  pw.cycle_nbr = hld_cycle_nbr AND
+  pw.pw_group_nbr != 0.0 AND
+  pw.active_ind = 1 AND
+
+  apc.pathway_id = pw.pathway_id AND
+  apc.comp_type_cd = 59116 AND
+  apc.activated_ind = 1 AND
+  apc.included_ind = 1 AND
+  apc.parent_entity_name = 'ORDERS' AND
+  apc.active_ind = 1 AND
+
+  od.order_id = o.order_id AND
+  od.oe_field_id = 79209766 AND
+
+  o.order_id = apc.parent_entity_id AND
+  o.active_ind = 1 AND
+  o.order_status_cd = 2859 AND
+  o.catalog_type_cd = 66274 AND
+  o.catalog_cd != 488572427 AND
+  o.protocol_order_id = 0
+ 
+DETAIL
+  IF(cnvtupper(o.hna_order_mnemonic) NOt LIKE 'SODIUM CHLORIDE*' AND cnvtupper(o.hna_order_mnemonic) NOT LIKE 'HEPARIN FLUSH*')
+	cnt = cnt + 1
+	stat = alterlist(reg_orders->lst, cnt)
+	reg_orders->lst[cnt].order_name = o.hna_order_mnemonic
+	reg_orders->lst[cnt].order_id = o.order_id
+	reg_orders->lst[cnt].treat_period = od.oe_field_display_value
+	reg_orders->lst[cnt].proposed = ' '
+  ENDIF
+WITH nocounter, time=120
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Servers to cycle: 52, 55, 80, 150, 151, 152, 175  */
+
+
+
+;/**************************************/
+;/* Load Proposed Orders
+;/**************************************/
+SELECT DISTINCT INTO "NL:"
+  o.hna_order_mnemonic,
+  o.order_proposal_id,
+  od.oe_field_display_value
+ 
+FROM
+  order_proposal_detail od,
+  order_proposal o
+ 
+WHERE
+  od.order_proposal_id = o.order_proposal_id AND
+  od.oe_field_id = 79209766 AND
+
+  o.created_dt_tm > CNVTLOOKBEHIND("5,min") AND
+  o.proposed_action_type_cd = 1167 AND
+  o.person_id = hld_person_id
+ 
+DETAIL
+  IF(CNVTUPPER(o.hna_order_mnemonic) NOT LIKE 'SODIUM CHLORIDE*' AND 
+     CNVTUPPER(o.hna_order_mnemonic) NOT LIKE 'HEPARIN FLUSH*' AND
+     CNVTUPPER(o.hna_order_mnemonic) NOT LIKE 'CHEMO TRACKER*')
+	cnt = cnt + 1
+	stat = alterlist(reg_orders->lst, cnt)
+	reg_orders->lst[cnt].order_name = o.hna_order_mnemonic
+	reg_orders->lst[cnt].order_id = o.order_proposal_id
+	reg_orders->lst[cnt].treat_period = od.oe_field_display_value
+	reg_orders->lst[cnt].proposed = 'P'
+  ENDIF
+WITH nocounter, time=120
+
+ 
+/**************************************/
+/* Get Dose for Proposed
+/**************************************/
+for(x = 1 to cnt)
+	set hld_dose = ""
+	; first, pull strength dose
+	SELECT INTO "NL:"
+	FROM
+		order_proposal_detail   OD
+ 
+	PLAN OD where od.order_proposal_id = reg_orders->lst[x].order_id
+			and od.oe_field_meaning in ('STRENGTHDOSE', 'STRENGTHDOSEUNIT')
+
+	ORDER BY od.order_proposal_id
+ 
+	DETAIL
+ 
+		if(od.oe_field_meaning = 'STRENGTHDOSE')
+			hld_dose = od.oe_field_display_value
+		else
+			if(od.oe_field_display_value = 'AUC(Carboplatin)')
+				hld_dose_unit = 'AUC'
+			else
+				hld_dose_unit = od.oe_field_display_value
+			endif
+		endif
+ 
+	FOOT od.order_proposal_id
+		reg_orders->lst[x].med_dose = concat(trim(hld_dose)," ",trim(hld_dose_unit))
+ 
+	WITH nocounter, time=120
+ 
+	; if no strength dose, look for volume dose
+	if(hld_dose = "")
+		SELECT INTO "NL:"
+		FROM
+  		order_proposal_detail   OD
+ 
+		PLAN OD where od.order_proposal_id = reg_orders->lst[x].order_id
+				and od.oe_field_meaning in ('VOLUMEDOSE', 'VOLUMEDOSEUNIT')
+ 
+		ORDER BY od.order_proposal_id
+ 
+		DETAIL
+ 
+			if(od.oe_field_meaning = 'VOLUMEDOSE')
+				hld_dose = od.oe_field_display_value
+			else
+				hld_dose_unit = od.oe_field_display_value
+			endif
+ 
+		FOOT od.order_proposal_id
+			reg_orders->lst[x].med_dose = concat(trim(hld_dose)," ",trim(hld_dose_unit))
+ 
+		WITH nocounter, time=120
+	endif
+endfor
+
+
+
+
+
+
+
+
+
+
+
+/**************************************/
+/* Get Dose
+/**************************************/
+for(x = 1 to cnt)
+	set hld_dose = ""
+	; first, pull strength dose
+	SELECT INTO "NL:"
+	FROM
+		ORDER_DETAIL   OD
+ 
+	PLAN OD where od.order_id = reg_orders->lst[x].order_id
+			and od.oe_field_meaning in ('STRENGTHDOSE', 'STRENGTHDOSEUNIT')
+			and od.action_sequence = (select max(odx.action_sequence) from order_detail odx
+										where odx.order_id = od.order_id
+										and odx.oe_field_meaning = 'STRENGTHDOSE')
+ 
+	ORDER BY od.order_id
+ 
+	DETAIL
+ 
+		if(od.oe_field_meaning = 'STRENGTHDOSE')
+			hld_dose = od.oe_field_display_value
+		else
+			if(od.oe_field_display_value = 'AUC(Carboplatin)')
+				hld_dose_unit = 'AUC'
+			else
+				hld_dose_unit = od.oe_field_display_value
+			endif
+		endif
+ 
+	FOOT od.order_id
+		reg_orders->lst[x].med_dose = concat(trim(hld_dose)," ",trim(hld_dose_unit))
+ 
+	WITH nocounter, time=120
+ 
+	; if no strength dose, look for volume dose
+	if(hld_dose = "")
+		SELECT INTO "NL:"
+		FROM
+			ORDER_DETAIL   OD
+ 
+		PLAN OD where od.order_id = reg_orders->lst[x].order_id
+				and od.oe_field_meaning in ('VOLUMEDOSE', 'VOLUMEDOSEUNIT')
+				and od.action_sequence = (select max(odx.action_sequence) from order_detail odx
+											where odx.order_id = od.order_id
+											and odx.oe_field_meaning = 'VOLUMEDOSE')
+ 
+		ORDER BY od.order_id
+ 
+		DETAIL
+ 
+			if(od.oe_field_meaning = 'VOLUMEDOSE')
+				hld_dose = od.oe_field_display_value
+			else
+				hld_dose_unit = od.oe_field_display_value
+			endif
+ 
+		FOOT od.order_id
+			reg_orders->lst[x].med_dose = concat(trim(hld_dose)," ",trim(hld_dose_unit))
+ 
+		WITH nocounter, time=120
+	endif
+endfor
+
+
+
+
+
+
+
+
+
+
+
+/**************************************/
+/* Create String with Order Info
+/**************************************/
+ 
+set ret_str = concat(rhead_font,wbu,"{",tblrb
+					,col1,col2,col3,wbu
+					,"Medication - v2.2",celle,cellb
+					,"Dose",celle,cellb
+					,"Treatment Period",celle,cellb
+					,tblre,"}")
+ 
+SET proposed = 0
+
+FOR (x = 1 to cnt)
+
+
+
+  IF (reg_orders->lst[x].proposed = 'P' AND proposed = 0)
+    SET proposed = 1
+
+    set ret_str = concat(trim(ret_str)
+	,"{",tblrb
+	,col1,col2,col3,wbu
+	,"Proposed:",celle,cellb
+	," ",celle,cellb
+	," ",celle,cellb
+	,tblre,"}")
+
+  
+  ENDIF
+
+
+
+  set ret_str = concat(trim(ret_str)
+	,"{",tblrb
+	,col1,col2,col3,wr
+	,trim(reg_orders->lst[x].order_name),celle,cellb
+	,trim(reg_orders->lst[x].med_dose),celle,cellb
+	,trim(reg_orders->lst[x].treat_period),celle,cellb
+	,tblre,"}")
+
+
+
+
+ENDFOR
+ 
+
+
+
+
+
+
+if(trim(ret_str) > ' ')
+	set retval = 100
+	set log_misc1 = ret_str
+else
+	set log_misc1 = "No other orders found for regimen / cycle"
+endif
+ 
+;call echo(ret_str)
+;call echorecord(reg_orders)
+
+end go

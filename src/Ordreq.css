@@ -1,0 +1,231 @@
+/*----- GLOBAL ELEMENTS-----*/
+/*--- PAGE ---*/
+/* entire printable page */
+.requisition {
+  background-color: #fff;
+  font-family     : Arial, sans-serif;
+}
+
+/* wraps printable page */
+.reqdetails {
+  padding-top: 10px;
+}
+
+/* Style for field labels */
+.bold-label {
+  font-weight: bold;
+}
+
+.bold-label.fullrow {
+  grid-column  : 1 / -1;
+}
+.bold-label.highlight-label{
+  font-size : 16px;
+  font-style: italic;
+  border-left: 3px solid #000;
+  padding-left: 2px;
+}
+
+/* section title-specific labels */
+.bold-label.title-label {
+  grid-column  : 1 / -1;
+  /* Span all columns */
+  text-align   : left;
+  /* Optional  : to center-align the title */
+  margin-bottom: 4px;
+  font-size    : 16px;
+}
+
+/* border around section titles */
+.bold-label.title-label .title-border {
+  
+  border-left: 2px solid #000;
+  border-bottom: 2px solid #000;
+  margin-left  : -5px;
+  padding-left : 1px;
+  padding-right: 100px;
+}
+
+
+/*---- SEGMENTS of PAGE ----*/
+.header {
+  text-align   : center;
+  font-size    : 24px;
+  margin-bottom: 10px;
+}
+
+/* body */
+.content {
+  font-size: 14px;
+}
+.content .section-title {
+  margin-left   : 8px;
+  padding-bottom: 2px;
+}
+
+/* footer {} */
+
+
+/*----- SECTIONS OF PAGE -----*/
+.section {
+  border        : 1px solid #000;
+  margin-bottom : 12px;
+  line-height   : 1.2;
+  padding-bottom: 8px;
+}
+.sectioncontents {
+  margin-top : 10px;
+  margin-left: 10px;
+}
+
+.sectioncontents p {
+  margin-top   : 4px;
+  margin-bottom: 4px;
+  margin-left  : 0;
+  margin-right : 0;
+  padding      : 0;
+}
+
+
+/*----- SUBSECTIONS -----*/
+/*--- Patient Info Grid Section ---*/
+/* NOTES:
+1 inch ~= 96px 
+1.5 inch ~= 144px */
+/*--- Patient Visit Info Grid Section ---*/
+/* Visit Info Container PARENT */
+.ptinfo-container {
+  margin-top   : 10px;
+  margin-bottom: 10px;
+}
+
+/*  Visit Info Content */
+.ptinfo-container .ptinfo-columns {
+  display              : grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  row-gap              : 2px;
+  /* space between rows */
+  column-gap           : 16px;
+  /* space between columns */
+}
+.patient-name {
+  grid-column  : 1 / -1;
+}
+
+.allergies-container {
+  margin-top: 6px;
+  margin-bottom: 10px;
+}
+
+.diagnosis-container {
+  margin-top: 6px;
+  margin-bottom: 10px;
+}
+/*
+.ordergridcontainer{
+  
+}
+*/
+
+
+/*--- Patient Visit Info Grid Section ---*/
+/* Visit Info Container PARENT */
+.visitinfo-container {
+  margin-top   : 10px;
+  margin-bottom: 10px;
+}
+
+/*  Visit Info Content */
+.visitinfo-container .visitinfo-columns {
+  display              : grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  row-gap              : 2px;
+  /* space between rows */
+  column-gap           : 16px;
+  /* space between columns */
+}
+
+
+
+/*--- Patient Insurance Grid Section ---*/
+/* Insurance Container PARENT */
+.insurance-container {
+  margin-top   : 10px;
+  margin-bottom: 10px;
+}
+
+/*  Insurance Content */
+.insurance-container .insurance-columns {
+  display              : grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  row-gap              : 2px;
+  /* space between rows */
+  column-gap           : 16px;
+  /* space between columns */
+}
+
+/*--- Order Info Grid Section ---*/
+/* Order Info Container PARENT */
+.orderinfo-container {
+  margin-top   : 10px;
+  margin-bottom: 10px;
+}
+
+/*  Orderinfo Content */
+.orderinfo-container .orderinfo-columns {
+  display              : grid;
+  grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+  row-gap              : 2px;
+  /* space between rows */
+  column-gap           : 16px;
+  /* space between columns */
+}
+
+/* orderinfo item spans single row/all columns */
+.orderinfo-fullrow {
+  grid-column  : 1 / -1;
+  /* Span all columns */
+  text-align   : left;
+  /* Optional  : to center-align the title */
+  margin-bottom: 0px;
+}
+
+/*--- Order Detail Grid Section ---*/
+/* Order Detail Container PARENT */
+.orderdetail-container {
+  margin-top   : 10px;
+  margin-bottom: 10px;
+}
+
+/*  Order Detail Content */
+.orderdetail-container .orderdetail-columns {
+  display              : grid;
+  grid-template-columns: repeat(2, 1fr);
+  row-gap              : 4px;
+  /* space between rows */
+  column-gap           : 4px;
+  /* space between columns */
+}
+
+/*  Order Details Content 
+.orderdetailitem {
+  display    : flex;
+  align-items: center;
+}*/
+
+/*----- OTHER -----*/
+/*--- Print Specs, Hide Non-Print Items ---*/
+@media print {
+  @page {
+    size : legal;
+    width: 8in;
+
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Add specific styles to match the image template */
+/* You may need to adjust margins, fonts, and spacing */
